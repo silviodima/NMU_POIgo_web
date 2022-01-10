@@ -1,4 +1,4 @@
-# mern-auth
+# POIgò website
 
 ![Final App](https://i.postimg.cc/tybZb8dL/final-MERNAuth.gif)
 Minimal full-stack MERN app with authentication using passport and JWTs.

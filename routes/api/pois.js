@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Load POI model
 const POI = require("../../models/POI");
-const ciao = '';
+
 // @route POST api/pois/add
 // @desc Add poi
 // @access Public

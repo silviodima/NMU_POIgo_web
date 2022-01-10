@@ -18,6 +18,23 @@ export const addPOI = (newPOI, history) => dispatch => {
       );
   };
 
+export const getCategories = () => dispatch => {
+  let categories = {}
+  axios
+  .get("/api/categories")
+  .then((response) => {
+    categories = response.json()
+    return categories;
+  })
+  .catch(err =>
+    dispatch({
+      type: GET_ERRORS,
+      payload: err.response.data
+    })
+  );
+}
+
+
 
 // Set logged in user
 export const setCurrentUser = decoded => {

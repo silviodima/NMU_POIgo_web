@@ -1,5 +1,6 @@
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import logo from "./poigo.png"
 
 class Navbar extends Component {
   render() {
@@ -14,8 +15,8 @@ class Navbar extends Component {
               }}
               className="col s5 brand-logo center black-text"
             >
-              <i className="material-icons">code</i>
-              MERN
+              <img src={logo} alt="Logo" />
+              POIGO!
             </Link>
           </div>
         </nav>

@@ -61,15 +61,15 @@ class Register extends Component {
         <div className="row">
           <div className="col s8 offset-s2">
             <Link to="/" className="btn-flat waves-effect">
-              <i className="material-icons left">keyboard_backspace</i> Back to
+              <i className="material-icons left">keyboard_backspace</i> Torna alla
               home
             </Link>
             <div className="col s12" style={{ paddingLeft: "11.250px" }}>
               <h4>
-                <b>Register</b> below
+                <b>Registrati</b> qui sotto
               </h4>
               <p className="grey-text text-darken-1">
-                Already have an account? <Link to="/login">Log in</Link>
+                Hai già un account? <Link to="/login">Accedi</Link>
               </p>
             </div>
             <form noValidate onSubmit={this.onSubmit}>
@@ -84,7 +84,7 @@ class Register extends Component {
                     invalid: errors.name
                   })}
                 />
-                <label htmlFor="name">Name</label>
+                <label htmlFor="name">Nome</label>
                 <span className="red-text">{errors.name}</span>
               </div>
               <div className="input-field col s12">
@@ -98,7 +98,7 @@ class Register extends Component {
                     invalid: errors.surname
                   })}
                 />
-                <label htmlFor="surname">Surname</label>
+                <label htmlFor="surname">Cognome</label>
                 <span className="red-text">{errors.surname}</span>
               </div>
               <div className="input-field col s12">
@@ -140,7 +140,7 @@ class Register extends Component {
                     invalid: errors.password2
                   })}
                 />
-                <label htmlFor="password2">Confirm Password</label>
+                <label htmlFor="password2">Conferma Password</label>
                 <span className="red-text">{errors.password2}</span>
               </div>
               <div className="col s12" style={{ paddingLeft: "11.250px" }}>
@@ -154,7 +154,7 @@ class Register extends Component {
                   type="submit"
                   className="btn btn-large waves-effect waves-light hoverable blue accent-3"
                 >
-                  Sign up
+                  Registrati
                 </button>
               </div>
             </form>

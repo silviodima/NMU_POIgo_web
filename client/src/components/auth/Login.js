@@ -57,15 +57,15 @@ class Login extends Component {
         <div style={{ marginTop: "4rem" }} className="row">
           <div className="col s8 offset-s2">
             <Link to="/" className="btn-flat waves-effect">
-              <i className="material-icons left">keyboard_backspace</i> Back to
+              <i className="material-icons left">keyboard_backspace</i> Torna alla
               home
             </Link>
             <div className="col s12" style={{ paddingLeft: "11.250px" }}>
               <h4>
-                <b>Login</b> below
+                <b>Accedi</b> qui sotto
               </h4>
               <p className="grey-text text-darken-1">
-                Don't have an account? <Link to="/register">Register</Link>
+                Non hai un account? <Link to="/register">Registrati</Link>
               </p>
             </div>
             <form noValidate onSubmit={this.onSubmit}>
@@ -114,7 +114,7 @@ class Login extends Component {
                   type="submit"
                   className="btn btn-large waves-effect waves-light hoverable blue accent-3"
                 >
-                  Login
+                  Accedi
                 </button>
               </div>
             </form>

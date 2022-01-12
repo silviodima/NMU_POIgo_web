@@ -9,14 +9,31 @@ import { withRouter } from "react-router-dom";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
-const categories = ["Arte", "Cultura", "Cucina"];
-const subCategories = ["Beni architettonici", "Pizzerie", "Artigianato"];
 
-//Capital letter needed!!
+const mapCategories = {
+  "Arte" : ["Beni architettonici", "Monumenti" ],
+  "Cultura": ["Museo", "Mostra", "Monumenti"],
+  "Cucina": ["Pizzerie", "Paninoteche"],
+  "Shopping": ["Abbigliamento", "Scarpe"]};
+
+const mapSubcategories = {
+  "Beni architettonici" : ["Ville e castelli", "Chiese antiche"],
+  "Monumenti": ["Monasteri e conventi", "Chiese rurali"]
+}
+
+
+const Results = () => (
+  <div id="results" className="search-results">
+    Some Results
+  </div>
+)
+
+
+//1st capital letter needed!!
 function CategoriesAndCo(props) {
   let items = [];
+
   for (let i = 0; i < props.numTimes; i++) {
-    console.log(props.children)
     items.push(props.children(i));
   }
   return <div>{items}</div>;
@@ -29,6 +46,7 @@ class Dashboard extends Component {
     this.beniCulturaliBtn = React.createRef();
     
     this.state = {
+      showResults: false,
       poi_name: "",
       photo: "",
       description: "",
@@ -39,7 +57,9 @@ class Dashboard extends Component {
       is_Validate: "",
       categories : [],
       subCategories: [],
+      clickedSubCategories: [],
       sections: [],
+      clickedSections: [],
       latitude: "",
       longitude: "",
       sections: "",
@@ -140,36 +160,72 @@ class Dashboard extends Component {
     //   const index = this.state.categories.indexOf(value[0])
     //   this.state.categories.splice(index, 1)
     // }
-    this.setState({
-      categories : value
-    })
-    let lista = Array.from(value)
-    console.log(value)
-    let node = this.beniCulturaliBtn.current;
+    // this.setState({
+    //   categories : value
+    // })
+
+    // // console.log("OH"+value)
+    // let lista = Array.from(value)
+    // console.log(value)
+    // let node = this.beniCulturaliBtn.current;
   
-    if((lista.includes("Shopping"))){
-      console.log(node.disabled)
-      node.disabled=true;
-      console.log(node.disabled)
+    // if((lista.includes("Shopping"))){
+    //   console.log(node.disabled)
+    //   node.disabled=true;
+    //   console.log(node.disabled)
+    //   node.onClick={}
+    // }
+    // else node.disabled=false;
+    this.setState({
+      categories: value,
+      // subCategories: mapCategories[categories]
+    })
+    // console.log(this.state.categories)
+    let supportSubcategories = []
+    for (let i = 0; i < value.length; i++) {
+      supportSubcategories = supportSubcategories.concat(mapCategories[value[i]])
     }
-    else node.disabled=false;
+    let uniq = [...new Set(supportSubcategories)];
+    // console.log(uniq)
+
+    this.setState({
+      subCategories: uniq
+    })
   };
 
   handleSubCategories = (event, value) => {
-    this.setState({
-      subCategories : value
-    })
+    // this.setState({
+    //   subCategories : value
+    // })
     console.log(value)
+    this.setState({
+      clickedSubCategories : value
+    })
+
+    let supportSections = []
+    for (let i = 0; i < value.length; i++) {
+      supportSections = supportSections.concat(mapSubcategories[value[i]])
+    }
+    let uniq = [...new Set(supportSections)];
+    // console.log(uniq)
+
+    this.setState({
+      sections: uniq
+    })
+  };
+
+  handleSections = (event, value) => {
+    // console.log(value)
+    this.setState({
+      clickedSections : value
+    })
   }
 
-  perfavore = (value) => {
-    console.log(value)
-    console.log(this.state.showResults)
-    this.setState({
-    })
-    console.log(this.state.showResults)
-
-  }
+  // onClick = () => {
+  //   console.log("UEUE"+this.state.showResults)
+  //   this.setState({showResults: !this.state.showResults});
+  //   console.log(this.showResults)
+  // }
   handleSelection = () => {
     // let element = document.getElementById('Arte')
     // ReactDOM.findDOMNode(element).style.backgroundColor = this.state.isClicked?'black' : 'white'
@@ -182,19 +238,19 @@ class Dashboard extends Component {
     const { user } = this.props.auth;
     const { errors } = this.state;
 
-  
     return (
-      <div style={{ height: "75vh" }} className="container valign-wrapper" style={{overflowY:'scroll'}}>
+      <div style={{ height: "75vh" }} className="container valign-wrapper"  style={{overflowY:'scroll'}}>
         <div className="row">
-          <div className="landing-copy col s12 center-align">
+          <div className="landing-copy col s12 center-align" >
             <h4>
+
               <b>Hey there,</b> {user.name.split(" ")[0]}
               <p className="flow-text grey-text text-darken-1">
                 You are logged into {" "}
                 <span style={{ fontFamily: "monospace" }}>POIGO</span>👏
               </p>
             </h4>
-            <form onSubmit={this.onSubmit}>
+            <form onSubmit={this.onSubmit} >
               <div className="input-field col s12">
                 <input
                   onChange={this.onChange}
@@ -279,21 +335,84 @@ class Dashboard extends Component {
                 <label htmlFor="password2">Numero di telefono</label>
                 <span className="red-text">{errors.tel_number}</span>
               </div>
-              <ToggleButtonGroup  style={{
-                  paddingTop: 30,
-                }}>
-              <CategoriesAndCo numTimes={categories.length}>
-                {(index) => <ToggleButton key={index}>{categories[index]}</ToggleButton>}
+              
+              <CategoriesAndCo numTimes={Object.keys(mapCategories).length}> 
+                {(index) => (
+                <ToggleButtonGroup
+                  value={this.state.categories}
+                  onChange={this.handleCategories}
+                  color="primary"
+                  style={{
+                    paddingTop: 30,
+                  }}>
+                  <ToggleButton 
+                                value={Object.keys(mapCategories)[index]} 
+                                id={index}>{Object.keys(mapCategories)[index]}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                )}
               </CategoriesAndCo>
-              </ToggleButtonGroup>
               {"\n"}
-              <ToggleButtonGroup  style={{
+              <CategoriesAndCo numTimes={this.state.subCategories.length}> 
+                {(index) => (
+                <ToggleButtonGroup
+                  value={this.state.clickedSubCategories}
+                  onChange={this.handleSubCategories}
+                  color="primary"
+                  style={{
+                    paddingTop: 30,
+                  }}>
+                  <ToggleButton 
+                          value={this.state.subCategories[index]} 
+                          id={index}>{this.state.subCategories[index]}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                )}
+              </CategoriesAndCo>
+              {"\n"}
+              <CategoriesAndCo numTimes={this.state.sections.length}> 
+                {(index) => (
+                <ToggleButtonGroup
+                  value={this.state.clickedSections}
+                  onChange={this.handleSections}
+                  color="primary"
+                  style={{
+                    paddingTop: 30,
+                  }}>
+                  <ToggleButton 
+                          value={this.state.sections[index]} 
+                          id={index}>{this.state.sections[index]}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                )}
+              </CategoriesAndCo>
+
+              
+
+              {/* <CategoriesAndCo numTimes={subCategories.length}> 
+                {(index) => (
+                <ToggleButtonGroup
+                  value={this.state.categories}
+                  onChange={this.handleCategories}
+                  color="primary"
+                  style={{
+                    paddingTop: 30,
+                  }}>
+                  <ToggleButton 
+                                value={subCategories[index]} 
+                                key={index}>{subCategories[index]}
+                  </ToggleButton>
+                </ToggleButtonGroup>
+                )}
+              </CategoriesAndCo> */}
+
+              {/* <ToggleButtonGroup  style={{
                   paddingTop: 30,
                 }}>
               <CategoriesAndCo numTimes={subCategories.length}>
                 {(index) => <ToggleButton key={index}>{subCategories[index]}</ToggleButton>}
               </CategoriesAndCo>
-              </ToggleButtonGroup>
+              </ToggleButtonGroup> */}
 
 
               {/* <ToggleButtonGroup
@@ -302,13 +421,13 @@ class Dashboard extends Component {
                 color="primary"
                 >
                 <ToggleButton value="Arte"id="Arte">
-                  Arte
+                  1
                 </ToggleButton>
                 <ToggleButton value="Cultura">
-                  Cultura
+                  2
                 </ToggleButton>
                 <ToggleButton value="Shopping">
-                  Shopping
+                  3
                 </ToggleButton>
               </ToggleButtonGroup> */}
               {/* <ToggleButtonGroup
@@ -351,7 +470,7 @@ class Dashboard extends Component {
                   Shopping
                 </ToggleButton>
               </ToggleButtonGroup>*/}
-              <ToggleButtonGroup
+              {/* <ToggleButtonGroup
                 style={{
                   paddingTop: 30,
                 }}
@@ -360,7 +479,7 @@ class Dashboard extends Component {
                 color="primary"
                 
                 >
-                <ToggleButton value="Beni architettonici" id="Beni_architettonici" ref={this.ArteButton}>
+                <ToggleButton value="Beni architettonici" id="Beni_architettonici" ref={this.beniCulturaliBtn} not disabled>
                   Beni architettonici
                 </ToggleButton>
                 <ToggleButton value="Monumenti" id="Monumenti">
@@ -390,7 +509,7 @@ class Dashboard extends Component {
                 <ToggleButton value="" id="">
                   Shopping
                 </ToggleButton>
-              </ToggleButtonGroup>             
+              </ToggleButtonGroup>              */}
               <div className="input-field col s12">
                 <input
                   onChange={this.onChange}

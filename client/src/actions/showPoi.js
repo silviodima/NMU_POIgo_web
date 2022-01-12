@@ -3,11 +3,11 @@ import setAuthToken from "../utils/setAuthToken";
 
 import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING } from "./types";
 
-//Add POI
+//get POI
 export const showPois = () => dispatch => {
-//  console.log()
+ console.log("sto in showpois")
     axios
-      .get("/api/pois/")
+      .get("/api/pois/get")
       .catch(err =>
         dispatch({
           type: GET_ERRORS,
@@ -15,23 +15,6 @@ export const showPois = () => dispatch => {
         })
       );
   };
-
-export const getCategories = () => dispatch => {
-  let categories = {}
-  axios
-  .get("/api/categories")
-  .then((response) => {
-    categories = response.json()
-    return categories;
-  })
-  .catch(err =>
-    dispatch({
-      type: GET_ERRORS,
-      payload: err.response.data
-    })
-  );
-}
-
 
 
 // Set logged in user

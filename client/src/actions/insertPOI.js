@@ -1,8 +1,10 @@
 import axios from "axios";
 import setAuthToken from "../utils/setAuthToken";
-import jwt_decode from "jwt-decode";
+// import jwt_decode from "jwt-decode";
 
-import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING } from "./types";
+import { GET_ERRORS, SET_CURRENT_USER } from "./types";
+// import { USER_LOADING } from "./types";
+
 
 //Add POI
 export const addPOI = (newPOI, history) => dispatch => {

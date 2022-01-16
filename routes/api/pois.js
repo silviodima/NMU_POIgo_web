@@ -7,11 +7,11 @@ const router = express.Router();
 const POI = require("../../models/POI");
   
 // Retrieve all the pois
-router.get('/get', async (req, res) => {
-    console.log("Sto qua")
-    const poi = await POI.find();
-    res.send(poi);
-});
+// router.get('/get', async (req, res) => {
+//     console.log("Sto qua")
+//     const poi = await POI.find();
+//     res.send(poi);
+// });
 
 
 // @route POST api/pois/add

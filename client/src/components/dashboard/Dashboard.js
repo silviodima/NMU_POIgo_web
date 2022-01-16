@@ -11,10 +11,11 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 
 const mapCategories = {
-  "Arte" : ["Beni architettonici", "Monumenti" ],
-  "Cultura": ["Museo", "Mostra", "Monumenti"],
-  "Cucina": ["Pizzerie", "Paninoteche"],
-  "Shopping": ["Abbigliamento", "Scarpe"]};
+  "Arte e cultura" : ["Borgo storico Calopezzati", "Borgo storico Pietrapaola" ],
+  "Cucina": ["Ristoranti", "Taverne", "Pizzerie", "Bracerie", "Cibo d'asporto", "Agriturismi"],
+  "Shopping": ["Abbigliamento e calzature", "Gioiellerie e articoli da regalo", "Artigianato"],
+  "Enogastronomia": ["Pasticcerie", "Degustazioni", "Enoteche", "Birrerie", "Cucina etnica", "Panetterie"],
+  "Sport e tempo libero": ["Centri sportivi", "Caccia e pesca", "Abbigliamento e attrezzatura sportiva", "Escursionismo"]};
 
 const mapSubcategories = {
   "Beni architettonici" : ["Ville e castelli", "Chiese antiche"],
@@ -48,6 +49,7 @@ class Dashboard extends Component {
     this.state = {
       showResults: false,
       poi_name: "",
+      selectedPhoto: "",
       photo: "",
       description: "",
       opening_hours: "",
@@ -75,9 +77,9 @@ class Dashboard extends Component {
     
     }
 
-    //Let's take all categories from db when user navigates to this page
-    // const fetched_categories = this.props.getCategories();
-    // console.log(fetched_categories)
+    // Let's take all categories from db when user navigates to this page
+    const fetched_categories = this.props.getCategories();
+    console.log(fetched_categories)
     // console.log("OH")
     // fetch("/api/categories")
     // .then((response) => {
@@ -97,7 +99,7 @@ class Dashboard extends Component {
 
 
   componentWillReceiveProps(nextProps) {
-    console.log(nextProps);
+    // console.log(nextProps);
     if (nextProps.errors) {
       this.setState({
         errors: nextProps.errors
@@ -112,33 +114,74 @@ class Dashboard extends Component {
   onSubmit = e => {
     e.preventDefault();
 
-    
-    const newPOI = {
-      poi_name: this.state.poi_name,
-      photo: "",
-      description: this.state.description,
-      opening_hours: this.state.opening_hours,
-      activity: {
-        email: this.state.email,
-        partita_iva: this.state.partita_iva,
-        tel_number: this.state.tel_number
-      },
-      is_Validate: true,
-      categories: this.state.categories,
-      subCategories: this.state.subCategories,
-      sections: this.state.sections,
-      location : {
-        type : 'Point',
-        coordinates : [ this.state.latitude,  this.state.longitude]
-      },
-      sections: {
 
-      }
-    };
+    console.log(this.state.photo)
+    this.uploadImage(this.state.selectedPhoto)
 
-    this.props.addPOI(newPOI, this.props.history);
-    console.log(newPOI);
   };
+
+  uploadImage = (file) => {
+    if(!file) return;
+    
+    console.log("uploadImage in dashboard")
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      this.toCloudinary(reader.result)
+    };
+    reader.onerror = () => {
+      console.error("ERROR DURING FILE LOADING")
+    }
+  }
+
+
+
+
+  toCloudinary = async (base64EncodedImage) => {
+    let url = "";
+    let data = "";
+    try {
+      url = await fetch('/api/upload/upload', {
+        method: "POST",
+        body: JSON.stringify({data: base64EncodedImage}),
+        headers: {'Content-type': 'application/json'},
+      })
+      data = await url.json();
+      console.log(data.valueOf())
+      this.setState({
+        photo: data
+      })
+
+      const newPOI = {
+        poi_name: this.state.poi_name,
+        photo: this.state.photo,
+        description: this.state.description,
+        opening_hours: this.state.opening_hours,
+        activity: {
+          email: this.state.email,
+          partita_iva: this.state.partita_iva,
+          tel_number: this.state.tel_number
+        },
+        is_Validate: true,
+        categories: this.state.categories,
+        subCategories: this.state.subCategories,
+        sections: this.state.sections,
+        location : {
+          type : 'Point',
+          coordinates : [ this.state.latitude,  this.state.longitude]
+        },
+        sections: {
+  
+        }
+      };
+  
+      // this.props.addPOI(newPOI, this.props.history);
+      console.log(newPOI);
+    }
+    catch(err) {
+      console.error(err)
+    }
+  }
 
 
   onLogoutClick = e => {
@@ -197,7 +240,7 @@ class Dashboard extends Component {
     // this.setState({
     //   subCategories : value
     // })
-    console.log(value)
+    // console.log(value)
     this.setState({
       clickedSubCategories : value
     })
@@ -221,8 +264,15 @@ class Dashboard extends Component {
     })
   }
 
-  handlePhoto = () => {
-    
+  handlePhoto = (e) => {
+    // console.log(e.target.value)
+    // console.log(e.target.files[0])
+    const file = e.target.files[0]
+    // console.log(file)
+    this.setState({
+      selectedPhoto: file
+    });
+    // console.log(this.selectedPhoto)
   }
 
 
@@ -346,7 +396,7 @@ class Dashboard extends Component {
                   }}>
                   <ToggleButton 
                                 value={Object.keys(mapCategories)[index]} 
-                                id={index}>{Object.keys(mapCategories)[index]}
+                                key={index}>{Object.keys(mapCategories)[index]}
                   </ToggleButton>
                 </ToggleButtonGroup>
                 )}

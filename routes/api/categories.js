@@ -7,17 +7,14 @@ const Category = require("../../models/Category");
 // @route GET api/categories/get
 // @desc get categories
 // @access Public
-router.get("/", (req, res) => {
-    //**************************###############FAI LA FORM VALIDATION
-    // Form validation
-    // const { errors, isValid } = validateRegisterInput(req.body);
-  
-    // Check validation
-    // if (!isValid) {
-    //   return res.status(400).json(errors);
-    // }
+router.get("/", async (req, res) => {
+    console.log("categories.js")
     const categories = await Category.find();
-    res.send(categories);
+    res.send(categories)
+    // const categories =  Category.find();
+    // // console.log(categories)
+    // // res.send(categories)
+    // res.json(categories);
 });
 
 module.exports = router;

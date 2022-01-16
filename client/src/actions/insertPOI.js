@@ -22,12 +22,10 @@ export const addPOI = (newPOI, history) => dispatch => {
 
 export const getCategories = () => dispatch => {
   let categories = {}
+  console.log("insetpOI")
   axios
   .get("/api/categories")
-  .then((response) => {
-    categories = response.json()
-    return categories;
-  })
+  .then(res => console.log(res))
   .catch(err =>
     dispatch({
       type: GET_ERRORS,

@@ -5,6 +5,8 @@ const passport = require("passport");
 
 const users = require("./routes/api/users");
 const POI = require("./routes/api/pois");
+const upload = require("./routes/api/upload");
+const categories = require("./routes/api/categories");
 
 const app = express();
 
@@ -38,6 +40,9 @@ require("./config/passport")(passport);
 // Routes
 app.use("/api/users", users);
 app.use("/api/pois", POI);
+app.use("/api/upload", upload);
+app.use("/api/categories", categories);
+
 
 const port = process.env.PORT || 5000;
 

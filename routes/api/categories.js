@@ -8,7 +8,7 @@ const Category = require("../../models/Category");
 // @desc get categories
 // @access Public
 router.get("/", async (req, res) => {
-    console.log("categories.js")
+    // console.log("categories.js")
     const categories = await Category.find();
     res.send(categories)
     // const categories =  Category.find();

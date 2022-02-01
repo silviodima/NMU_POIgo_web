@@ -8,6 +8,13 @@ import classnames from "classnames";
 import { withRouter } from "react-router-dom";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import { Alert } from "@mui/material";
+import isEmpty from "is-empty";
+
+
+const dictCategories = {}
+const sectionIDs = {}
+const ids = []
 
 
 const mapCategories = {
@@ -17,23 +24,12 @@ const mapCategories = {
   "Enogastronomia": ["Pasticcerie", "Degustazioni", "Enoteche", "Birrerie", "Cucina etnica", "Panetterie"],
   "Sport e tempo libero": ["Centri sportivi", "Caccia e pesca", "Abbigliamento e attrezzatura sportiva", "Escursionismo"]};
 
-const mapSubcategories = {
-  "Beni architettonici" : ["Ville e castelli", "Chiese antiche"],
-  "Monumenti": ["Monasteri e conventi", "Chiese rurali"]
-}
-
-
-const Results = () => (
-  <div id="results" className="search-results">
-    Some Results
-  </div>
-)
-
+let dictSubcategories = {}
 
 //1st capital letter needed!!
 function CategoriesAndCo(props) {
   let items = [];
-
+  
   for (let i = 0; i < props.numTimes; i++) {
     items.push(props.children(i));
   }
@@ -57,14 +53,15 @@ class Dashboard extends Component {
       partita_iva: "",
       tel_number: "",
       is_Validate: "",
-      categories : [],
-      subCategories: [],
-      clickedSubCategories: [],
-      sections: [],
-      clickedSections: [],
+      categories : NaN,
+      subCategories: NaN,
+      clickedSubCategories: NaN,
+      sections: NaN,
+      clickedSections: NaN,
       latitude: "",
       longitude: "",
-      sections: "",
+      address: "",
+      createdBy: "",    
       errors: {}
     };
   }
@@ -76,25 +73,59 @@ class Dashboard extends Component {
       this.props.history.push("/login");
     
     }
-
+    let subcategories = []
+    let sections = []
+    let i=0;
+    let j=0;
+    let k=0;
+    let dictIDs = [];
     // Let's take all categories from db when user navigates to this page
-    const fetched_categories = this.props.getCategories();
-    console.log(fetched_categories)
-    // console.log("OH")
-    // fetch("/api/categories")
-    // .then((response) => {
-    //   return response.json();
-    // })
-    // .then(data => {
-    //   let categoriesFromApi = data.map(category => {
-    //     return {value: category, display: category}
-    //   });
-    //   this.setState({
-    //     categories: [{value: '', display: '(Select your favourite team)'}].concat(categoriesFromApi)
-    //   });
-    // }).catch(error => {
-    //   console.log(error);
-    // });
+    //with a top-level async await function
+    (async () => {
+      try {
+        const fetched_categories = await this.props.getCategories();
+
+        for (i=0;i<fetched_categories.length;i++) {
+          subcategories = [];
+          let currentCat = fetched_categories[i]['name'];
+          // console.log("cat"+currentCat)
+          dictCategories[currentCat] = {};
+          for (j= 0; j<fetched_categories[i]['subcategories'].length;j++) {
+            sections = [];
+            dictIDs = [];
+            let currentSubcat = fetched_categories[i]['subcategories'][j]['name']; 
+            // console.log("subcat"+currentSubcat)
+            subcategories.push(currentSubcat)
+            dictSubcategories[currentSubcat] = {}
+            sectionIDs[currentSubcat] = {}
+            // dictCategories[fetched_categories[i]['name']].add(fetched_categories[i]['subcategories'][j]['name']);
+            for(k=0; k<fetched_categories[i]['subcategories'][j]['sections'].length; k++) {
+              let currentSect = fetched_categories[i]['subcategories'][j]['sections'][k]['name'];
+              // console.log("sect"+currentSect)
+              sections.push(currentSect)
+              dictIDs[currentSect] = fetched_categories[i]['subcategories'][j]['sections'][k]['_id']
+              // console.log("sect"+fetched_categories[i]['subcategories'][j]['sections'][k]['_id'])
+            }
+            // console.log(dictIDs)
+            sectionIDs[currentSubcat] = dictIDs;
+            dictSubcategories[currentSubcat] = sections;
+            // console.log(sections)
+            // dictSubcategories[currentSubcat] = sections
+          }
+          dictCategories[currentCat] = subcategories
+
+        }
+        // console.log(dictSubcategories)
+        // console.log(sectionIDs)
+        // console.log(mapCategories)
+        // console.log(dictCategories)
+        //   dictCategories[fetched_categories[i]['name']
+        // console.log((fetched_categories[1]['name']))
+        // console.log(mapCategories['Arte e cultura'])
+      } catch (e) {
+          // Deal with the fact the chain failed
+      }
+    })();
 }
 
 
@@ -115,15 +146,19 @@ class Dashboard extends Component {
     e.preventDefault();
 
 
-    console.log(this.state.photo)
+    // console.log(this.state.photo)
     this.uploadImage(this.state.selectedPhoto)
 
   };
 
   uploadImage = (file) => {
-    if(!file) return;
+    if(!file){
+      const newPOI = {}
+      this.props.addPOI(newPOI, this.props.history);
+      return;
+    }
     
-    console.log("uploadImage in dashboard")
+    // console.log("uploadImage in dashboard")
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
@@ -147,9 +182,9 @@ class Dashboard extends Component {
         headers: {'Content-type': 'application/json'},
       })
       data = await url.json();
-      console.log(data.valueOf())
+      // console.log(data["msg"])
       this.setState({
-        photo: data
+        photo: data["msg"]
       })
 
       const newPOI = {
@@ -157,26 +192,21 @@ class Dashboard extends Component {
         photo: this.state.photo,
         description: this.state.description,
         opening_hours: this.state.opening_hours,
-        activity: {
-          email: this.state.email,
-          partita_iva: this.state.partita_iva,
-          tel_number: this.state.tel_number
-        },
+        email: this.state.email,
+        partita_iva: this.state.partita_iva,
+        tel_number: this.state.tel_number,
         is_Validate: true,
         categories: this.state.categories,
-        subCategories: this.state.subCategories,
-        sections: this.state.sections,
-        location : {
-          type : 'Point',
-          coordinates : [ this.state.latitude,  this.state.longitude]
-        },
-        sections: {
-  
-        }
+        clickedSubCategories: this.state.clickedSubCategories,
+        clickedSections: !isEmpty(ids)? ids: null,
+        latitude: this.state.latitude,
+        longitude: this.state.longitude,
+        address: this.state.address,
+        createdBy: this.props.auth["user"]["id"]
       };
   
-      // this.props.addPOI(newPOI, this.props.history);
-      console.log(newPOI);
+      this.props.addPOI(newPOI, this.props.history);
+      // console.log(newPOI);
     }
     catch(err) {
       console.error(err)
@@ -192,42 +222,16 @@ class Dashboard extends Component {
 
     
   handleCategories = (event, value) => {
-    // categories = this.setState({
-    //   categories : value
-    // })
-    // if(!this.state.categories.includes(value[0])) {
-    //   this.state.categories.push(value[0])
-    //   console.log("aggiunto")
-    // }
-    // else {
-    //   const index = this.state.categories.indexOf(value[0])
-    //   this.state.categories.splice(index, 1)
-    // }
-    // this.setState({
-    //   categories : value
-    // })
 
-    // // console.log("OH"+value)
-    // let lista = Array.from(value)
-    // console.log(value)
-    // let node = this.beniCulturaliBtn.current;
-  
-    // if((lista.includes("Shopping"))){
-    //   console.log(node.disabled)
-    //   node.disabled=true;
-    //   console.log(node.disabled)
-    //   node.onClick={}
-    // }
-    // else node.disabled=false;
     this.setState({
       categories: value,
-      // subCategories: mapCategories[categories]
     })
     // console.log(this.state.categories)
     let supportSubcategories = []
     for (let i = 0; i < value.length; i++) {
-      supportSubcategories = supportSubcategories.concat(mapCategories[value[i]])
+      supportSubcategories = supportSubcategories.concat(dictCategories[value[i]])
     }
+    // console.log(supportSubcategories)
     let uniq = [...new Set(supportSubcategories)];
     // console.log(uniq)
 
@@ -237,17 +241,17 @@ class Dashboard extends Component {
   };
 
   handleSubCategories = (event, value) => {
-    // this.setState({
-    //   subCategories : value
-    // })
     // console.log(value)
     this.setState({
       clickedSubCategories : value
     })
 
+    // console.log(value)
+    // console.log(dictSubcategories)
     let supportSections = []
     for (let i = 0; i < value.length; i++) {
-      supportSections = supportSections.concat(mapSubcategories[value[i]])
+      // console.log(dictSubcategories[value[i]])
+      supportSections = supportSections.concat(dictSubcategories[value[i]])
     }
     let uniq = [...new Set(supportSections)];
     // console.log(uniq)
@@ -259,14 +263,24 @@ class Dashboard extends Component {
 
   handleSections = (event, value) => {
     // console.log(value)
+    // console.log(Object.values(sectionIDs["Borgo storico Pietrapaola"]))
+    // console.log(this.state.clickedSubCategories)
+    for (let i=0; i<this.state.clickedSubCategories.length; i++) {
+      for (let j = 0; j<value.length; j++) {
+        // console.log(sectionIDs[this.state.clickedSubCategories[i]][value[j]])
+        if(sectionIDs[this.state.clickedSubCategories[i]][value[j]]!=undefined)
+          ids.push(sectionIDs[this.state.clickedSubCategories[i]][value[j]])
+      }
+    }
+    // console.log(sectionIDs)
+    // console.log(ids);
     this.setState({
       clickedSections : value
     })
   }
 
   handlePhoto = (e) => {
-    // console.log(e.target.value)
-    // console.log(e.target.files[0])
+
     const file = e.target.files[0]
     // console.log(file)
     this.setState({
@@ -286,13 +300,19 @@ class Dashboard extends Component {
           <div className="landing-copy col s12 center-align" >
             <h4>
 
-              <b>Hey there,</b> {user.name.split(" ")[0]}
+              <b>Hey,</b> {user.name.split(" ")[0]}
               <p className="flow-text grey-text text-darken-1">
-                You are logged into {" "}
+                Benvenuto su {" "}
                 <span style={{ fontFamily: "monospace" }}>POIGO</span>👏
               </p>
             </h4>
             <form onSubmit={this.onSubmit} >
+            <div className="input-field col s12">
+                <input
+                  value={user.id}
+                  type="hidden"
+                />
+              </div>
               <div className="input-field col s12">
                 <input
                   onChange={this.onChange}
@@ -308,12 +328,13 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.poi_name}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <textarea
                   onChange={this.onChange}
                   value={this.state.description}
                   error={errors.description}
                   id="description"
                   type="text"
+                  style={{height: "150px"}}
                   className={classnames("", {
                     invalid: errors.description
                   })}
@@ -332,16 +353,23 @@ class Dashboard extends Component {
                     invalid: errors.opening_hours
                   })}
                 />
-                <label htmlFor="text">Orario di apertura</label>
+                <label htmlFor="text">Orario di apertura (Es. 9-12 14-18)</label>
                 <span className="red-text">{errors.opening_hours}</span>
               </div>
+              <div className="input-field col s12">
               <input 
                 type="file" 
                 accept=".png, .jpg, .jpeg"
+                error={errors.photo}
                 name="photo"
                 onChange={this.handlePhoto}
+                className={classnames("", {
+                  invalid: errors.photo
+                })}
               >
               </input>
+              <span className="red-text">{errors.photo}</span>
+              </div>
               <div className="input-field col s12">
                 <input
                   onChange={this.onChange}
@@ -363,11 +391,12 @@ class Dashboard extends Component {
                   error={errors.partita_iva}
                   id="partita_iva"
                   type="text"
+                  maxLength={11}
                   className={classnames("", {
                     invalid: errors.partita_iva
                   })}
                 />
-                <label htmlFor="password2">Partita Iva</label>
+                <label htmlFor="partita_iva">Partita Iva (non obbligatoria)</label>
                 <span className="red-text">{errors.partita_iva}</span>
               </div>
               <div className="input-field col s12">
@@ -376,15 +405,21 @@ class Dashboard extends Component {
                   value={this.state.tel_number}
                   error={errors.tel_number}
                   id="tel_number"
-                  type="number"
+                  type="tel"
+                  maxLength={10}
                   className={classnames("", {
                     invalid: errors.tel_number
                   })}
                 />
-                <label htmlFor="password2">Numero di telefono</label>
+                <label htmlFor="tel_number">Numero di telefono</label>
                 <span className="red-text">{errors.tel_number}</span>
               </div>
-              
+              <div 
+              style={{}}
+              className={classnames("", {
+                invalid: errors.categories
+              })}>Scegli una o più categorie
+              </div>
               <CategoriesAndCo numTimes={Object.keys(mapCategories).length}> 
                 {(index) => (
                 <ToggleButtonGroup
@@ -401,7 +436,10 @@ class Dashboard extends Component {
                 </ToggleButtonGroup>
                 )}
               </CategoriesAndCo>
+              <span className="red-text">{errors.categories}</span>
+
               {"\n"}
+              <div style={{}}>Scegli una o più sottocategorie</div>
               <CategoriesAndCo numTimes={this.state.subCategories.length}> 
                 {(index) => (
                 <ToggleButtonGroup
@@ -418,7 +456,9 @@ class Dashboard extends Component {
                 </ToggleButtonGroup>
                 )}
               </CategoriesAndCo>
+              <span className="red-text">{errors.clickedSubCategories}</span>
               {"\n"}
+              <div style={{}}>Scegli una o più sezioni</div>
               <CategoriesAndCo numTimes={this.state.sections.length}> 
                 {(index) => (
                 <ToggleButtonGroup
@@ -435,130 +475,21 @@ class Dashboard extends Component {
                 </ToggleButtonGroup>
                 )}
               </CategoriesAndCo>
-
-              
-
-              {/* <CategoriesAndCo numTimes={subCategories.length}> 
-                {(index) => (
-                <ToggleButtonGroup
-                  value={this.state.categories}
-                  onChange={this.handleCategories}
-                  color="primary"
-                  style={{
-                    paddingTop: 30,
-                  }}>
-                  <ToggleButton 
-                                value={subCategories[index]} 
-                                key={index}>{subCategories[index]}
-                  </ToggleButton>
-                </ToggleButtonGroup>
-                )}
-              </CategoriesAndCo> */}
-
-              {/* <ToggleButtonGroup  style={{
-                  paddingTop: 30,
-                }}>
-              <CategoriesAndCo numTimes={subCategories.length}>
-                {(index) => <ToggleButton key={index}>{subCategories[index]}</ToggleButton>}
-              </CategoriesAndCo>
-              </ToggleButtonGroup> */}
-
-
-              {/* <ToggleButtonGroup
-                value={this.state.categories}
-                onChange={this.handleCategories}
-                color="primary"
-                >
-                <ToggleButton value="Arte"id="Arte">
-                  1
-                </ToggleButton>
-                <ToggleButton value="Cultura">
-                  2
-                </ToggleButton>
-                <ToggleButton value="Shopping">
-                  3
-                </ToggleButton>
-              </ToggleButtonGroup> */}
-              {/* <ToggleButtonGroup
-                style={{
-                  paddingTop: 30,
-                }}
-                value={this.state.subCategories}
-                onChange={this.handleSubCategories}
-                color="primary"
-                
-                >
-                <ToggleButton value="Beni architettonici" id="Beni_architettonici"  ref={this.beniCulturaliBtn} disabled>
-                  Beni architettonici
-                </ToggleButton>
-                <ToggleButton value="Monumenti" id="Monumenti">
-                  Monumenti
-                </ToggleButton>
-                <ToggleButton value="Cucina tipica" id="Cucina tipica">
-                  Cucina tipica
-                </ToggleButton>
-                <ToggleButton value="Pizzerie" id="Pizzerie">
-                  Pizzerie
-                </ToggleButton>
-                <ToggleButton value="Bar" id="Bar">
-                  Bar
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-              </ToggleButtonGroup>*/}
-              {/* <ToggleButtonGroup
-                style={{
-                  paddingTop: 30,
-                }}
-                value={this.state.subCategories}
-                onChange={this.handleSubCategories}
-                color="primary"
-                
-                >
-                <ToggleButton value="Beni architettonici" id="Beni_architettonici" ref={this.beniCulturaliBtn} not disabled>
-                  Beni architettonici
-                </ToggleButton>
-                <ToggleButton value="Monumenti" id="Monumenti">
-                  Monumenti
-                </ToggleButton>
-                <ToggleButton value="Cucina tipica" id="Cucina tipica">
-                  Cucina tipica
-                </ToggleButton>
-                <ToggleButton value="Pizzerie" id="Pizzerie">
-                  Pizzerie
-                </ToggleButton>
-                <ToggleButton value="Bar" id="Bar">
-                  Bar
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-                <ToggleButton value="" id="">
-                  Shopping
-                </ToggleButton>
-              </ToggleButtonGroup>              */}
+              <span className="red-text">{errors.clickedSections}</span>
+              <div className="input-field col s12">
+                <input
+                  onChange={this.onChange}
+                  value={this.state.address}
+                  error={errors.address}
+                  id="address"
+                  type="text"
+                  className={classnames("", {
+                    invalid: errors.address
+                  })}
+                />
+                <label htmlFor="address">Indirizzo </label>
+                <span className="red-text">{errors.address}</span>
+              </div>
               <div className="input-field col s12">
                 <input
                   onChange={this.onChange}
@@ -570,7 +501,7 @@ class Dashboard extends Component {
                     invalid: errors.latitude
                   })}
                 />
-                <label htmlFor="latitude">Latitudine</label>
+                <label htmlFor="latitude">Latitudine </label>
                 <span className="red-text">{errors.latitude}</span>
               </div>
               <div className="input-field col s12">

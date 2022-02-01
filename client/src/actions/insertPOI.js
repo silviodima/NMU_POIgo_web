@@ -20,19 +20,20 @@ export const addPOI = (newPOI, history) => dispatch => {
       );
   };
 
-export const getCategories = () => dispatch => {
-  let categories = {}
-  console.log("insetpOI")
-  axios
-  .get("/api/categories")
-  .then(res => console.log(res))
-  .catch(err =>
-    dispatch({
-      type: GET_ERRORS,
-      payload: err.response.data
-    })
-  );
-}
+//Get categories
+export const getCategories = () => async (dispatch) => {
+  let categories =  await axios
+    .get("/api/categories")
+    .then(res => categories = res.data)
+    .catch(err => 
+      dispatch({
+        type: GET_ERRORS,
+        payload: err.response.data
+      })
+    );
+    // console.log(categories)
+    return categories;
+  }
 
 
 

@@ -5,7 +5,7 @@ import { GET_ERRORS, SET_CURRENT_USER, USER_LOADING } from "./types";
 
 //get POI
 export const showPois = () => dispatch => {
- console.log("sto in showpois")
+//  console.log("sto in showpois")
     axios
       .get("/api/pois/get")
       .catch(err =>

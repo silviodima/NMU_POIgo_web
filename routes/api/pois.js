@@ -1,35 +1,27 @@
 const express = require("express");
 const router = express.Router();
 
-
+// Load input validation
+const validatePOIInsertion = require("../../validation/addPoi");
 
 // Load POI model
 const POI = require("../../models/POI");
-  
-// Retrieve all the pois
-// router.get('/get', async (req, res) => {
-//     console.log("Sto qua")
-//     const poi = await POI.find();
-//     res.send(poi);
-// });
-
 
 // @route POST api/pois/add
 // @desc Add poi
 // @access Public
 router.post("/add", (req, res) => {
-    //**************************###############FAI LA FORM VALIDATION
+    console.log(req.body)
     // Form validation
-    // const { errors, isValid } = validateRegisterInput(req.body);
-  
+    const { errors, isValid } = validatePOIInsertion(req.body);
     // Check validation
-    // if (!isValid) {
-    //   return res.status(400).json(errors);
-    // }
-  
+    if (!isValid) {
+      return res.status(400).json(errors);
+    }
+
     const newPOI = new POI({
-        poi_name: req.body.poi_name,
-        photo: "",
+        name: req.body.poi_name,
+        photo: req.body.photo,
         description: req.body.description,
         opening_hours: req.body.opening_hours,
         activity: {
@@ -40,9 +32,12 @@ router.post("/add", (req, res) => {
         is_Validate: true,
         location : {
             type : 'Point',
-            coordinate : [ req.body.latitude,  req.body.longitude]
+            coordinates : [ req.body.latitude,  req.body.longitude],
+            address: req.body.address,
         },
-        sections: req.body.sections
+
+        sections: req.body.clickedSections,
+        createdBy: req.body.createdBy
     });
   
     newPOI

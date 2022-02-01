@@ -13,9 +13,17 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "@emotion/react": "^11.7.1",
+    "@emotion/styled": "^11.6.0",
+    "@mui/icons-material": "^5.2.5",
+    "@mui/material": "^5.2.7",
+    "@react-native-community/checkbox": "^0.5.9",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.18.3",
+    "cloudinary": "^1.28.1",
     "concurrently": "^4.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^11.0.0",
     "express": "^4.16.4",
     "is-empty": "^1.2.0",
     "jsonwebtoken": "^8.3.0",
@@ -23,6 +31,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "react-bootstrap": "^2.1.0",
+    "rn-checkbox-list": "^1.1.0",
     "validator": "^10.9.0"
   }
 }

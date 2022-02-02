@@ -16,7 +16,7 @@ app.use(
     extended: false
   })
 );
-app.use(bodyParser.json());
+//app.use(bodyParser.json());
 
 // DB Config
 const db = require("./config/keys").mongoURI;

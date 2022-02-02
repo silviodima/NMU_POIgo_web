@@ -323,7 +323,7 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.poi_name
                   })}
-                />
+                required />
                 <label htmlFor="poi_name">Nome POI</label>
                 <span className="red-text">{errors.poi_name}</span>
               </div>
@@ -343,7 +343,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.description}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.opening_hours}
                   error={errors.opening_hours}
@@ -371,7 +371,7 @@ class Dashboard extends Component {
               <span className="red-text">{errors.photo}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.email}
                   error={errors.email}
@@ -385,7 +385,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.email}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input 
                   onChange={this.onChange}
                   value={this.state.partita_iva}
                   error={errors.partita_iva}
@@ -400,7 +400,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.partita_iva}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.tel_number}
                   error={errors.tel_number}
@@ -477,7 +477,7 @@ class Dashboard extends Component {
               </CategoriesAndCo>
               <span className="red-text">{errors.clickedSections}</span>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.address}
                   error={errors.address}
@@ -491,7 +491,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.address}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.latitude}
                   error={errors.latitude}
@@ -505,7 +505,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.latitude}</span>
               </div>
               <div className="input-field col s12">
-                <input
+                <input required
                   onChange={this.onChange}
                   value={this.state.longitude}
                   error={errors.longitude}

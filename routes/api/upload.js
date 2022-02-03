@@ -8,8 +8,10 @@ router.use(express.static('public'));
 // router.use(express.json({ limit: '50mb' }));
 router.use(express.json({ limit: "100mb" }))
 
-router.use(express.urlencoded({ limit: '100mb', extended: true, parameterLimit: 100000}));
+router.use(express.urlencoded({ limit: '100mb', extended: true}));
 router.use(cors());
+
+
 
 router.post('/upload', async (req, res) => {
     try {

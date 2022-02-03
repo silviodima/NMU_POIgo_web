@@ -26,7 +26,7 @@ router.post("/register", (req, res) => {
 
   User.findOne({ email: req.body.email }).then(user => {
     if (user) {
-      return res.status(400).json({ email: "Email already exists" });
+      return res.status(400).json({ email: "Email già esistente, prova con un'altra" });
     } else {
       const newUser = new User({
         name: req.body.name,
@@ -89,7 +89,7 @@ router.post("/login", (req, res) => {
           payload,
           keys.secretOrKey,
           {
-            expiresIn: 31556926 // 1 year in seconds
+            expiresIn: 7200 // 2 hours in seconds
           },
           (err, token) => {
             res.json({

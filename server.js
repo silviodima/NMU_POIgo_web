@@ -9,14 +9,14 @@ const upload = require("./routes/api/upload");
 const categories = require("./routes/api/categories");
 
 const app = express();
-
+app.use('/api/upload', express.json({ limit: '50mb' }), express.urlencoded({extended:true, limit: '50mb' }), upload);
 // Bodyparser middleware
-app.use(
-  bodyParser.urlencoded({
-    extended: false
-  })
-);
-//app.use(bodyParser.json());
+// app.use(
+//   bodyParser.urlencoded({
+//     extended: false
+//   })
+// );
+app.use(bodyParser.json());
 
 // DB Config
 const db = require("./config/keys").mongoURI;

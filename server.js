@@ -12,11 +12,11 @@ const app = express();
 
 // Bodyparser middleware
 app.use(
-  bodyParser.urlencoded({
-    extended: false
+  bodyParser.urlencoded({ limit:'50mb',
+    extended: true
   })
 );
-//app.use(bodyParser.json());
+app.use(bodyParser.json());
 
 // DB Config
 const db = require("./config/keys").mongoURI;

@@ -8,7 +8,7 @@ import { GET_ERRORS, SET_CURRENT_USER } from "./types";
 
 //Add POI
 export const addPOI = (newPOI, history) => dispatch => {
-  console.log(newPOI)
+  // console.log(newPOI)
     axios
       .post("/api/pois/add", newPOI)
       .then(res => history.push("/dashboard"))

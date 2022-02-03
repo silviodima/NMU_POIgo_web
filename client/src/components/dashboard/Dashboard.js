@@ -8,7 +8,6 @@ import classnames from "classnames";
 import { withRouter } from "react-router-dom";
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
-import { Alert } from "@mui/material";
 import isEmpty from "is-empty";
 
 
@@ -158,7 +157,6 @@ class Dashboard extends Component {
       return;
     }
     
-    // console.log("uploadImage in dashboard")
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onloadend = () => {
@@ -175,6 +173,29 @@ class Dashboard extends Component {
   toCloudinary = async (base64EncodedImage) => {
     let url = "";
     let data = "";
+    if(!this.state.categories || !this.state.clickedSubCategories || ids.length == 0) {
+      const newPOI = {
+        poi_name: this.state.poi_name,
+        photo: "no photo",
+        description: this.state.description,
+        opening_hours: this.state.opening_hours,
+        email: this.state.email,
+        partita_iva: this.state.partita_iva,
+        tel_number: this.state.tel_number,
+        is_Validate: true,
+        categories: this.state.categories,
+        clickedSubCategories: this.state.clickedSubCategories,
+        clickedSections: !isEmpty(ids)? ids: null,
+        latitude: this.state.latitude,
+        longitude: this.state.longitude,
+        address: this.state.address,
+        createdBy: this.props.auth["user"]["id"]
+      };
+
+      this.props.addPOI(newPOI, this.props.history);
+      return;
+    }
+    
     try {
       url = await fetch('/api/upload/upload', {
         method: "POST",
@@ -206,7 +227,7 @@ class Dashboard extends Component {
       };
   
       this.props.addPOI(newPOI, this.props.history);
-      // console.log(newPOI);
+      
     }
     catch(err) {
       console.error(err)
@@ -323,7 +344,8 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.poi_name
                   })}
-                required />
+                  required
+                 />
                 <label htmlFor="poi_name">Nome POI</label>
                 <span className="red-text">{errors.poi_name}</span>
               </div>
@@ -338,12 +360,13 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.description
                   })}
+                  required
                 />
                 <label htmlFor="description">Descrizione</label>
                 <span className="red-text">{errors.description}</span>
               </div>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.opening_hours}
                   error={errors.opening_hours}
@@ -352,6 +375,7 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.opening_hours
                   })}
+                  required
                 />
                 <label htmlFor="text">Orario di apertura (Es. 9-12 14-18)</label>
                 <span className="red-text">{errors.opening_hours}</span>
@@ -366,12 +390,13 @@ class Dashboard extends Component {
                 className={classnames("", {
                   invalid: errors.photo
                 })}
+                required
               >
               </input>
               <span className="red-text">{errors.photo}</span>
               </div>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.email}
                   error={errors.email}
@@ -380,6 +405,7 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.email
                   })}
+                  required
                 />
                 <label htmlFor="email">Email</label>
                 <span className="red-text">{errors.email}</span>
@@ -400,7 +426,7 @@ class Dashboard extends Component {
                 <span className="red-text">{errors.partita_iva}</span>
               </div>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.tel_number}
                   error={errors.tel_number}
@@ -410,6 +436,7 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.tel_number
                   })}
+                  required
                 />
                 <label htmlFor="tel_number">Numero di telefono</label>
                 <span className="red-text">{errors.tel_number}</span>
@@ -418,7 +445,8 @@ class Dashboard extends Component {
               style={{}}
               className={classnames("", {
                 invalid: errors.categories
-              })}>Scegli una o più categorie
+              })}
+              >Scegli una o più categorie
               </div>
               <CategoriesAndCo numTimes={Object.keys(mapCategories).length}> 
                 {(index) => (
@@ -439,7 +467,12 @@ class Dashboard extends Component {
               <span className="red-text">{errors.categories}</span>
 
               {"\n"}
-              <div style={{}}>Scegli una o più sottocategorie</div>
+              <div style={{}} 
+                className={classnames("", {
+                invalid: errors.clickedSubCategories
+              })}
+              >
+              Scegli una o più sottocategorie</div>
               <CategoriesAndCo numTimes={this.state.subCategories.length}> 
                 {(index) => (
                 <ToggleButtonGroup
@@ -458,7 +491,12 @@ class Dashboard extends Component {
               </CategoriesAndCo>
               <span className="red-text">{errors.clickedSubCategories}</span>
               {"\n"}
-              <div style={{}}>Scegli una o più sezioni</div>
+              <div 
+                style={{}}
+                className={classnames("", {
+                  invalid: errors.clickedSections
+                })}
+                >Scegli una o più sezioni</div>
               <CategoriesAndCo numTimes={this.state.sections.length}> 
                 {(index) => (
                 <ToggleButtonGroup
@@ -477,7 +515,7 @@ class Dashboard extends Component {
               </CategoriesAndCo>
               <span className="red-text">{errors.clickedSections}</span>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.address}
                   error={errors.address}
@@ -486,12 +524,13 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.address
                   })}
+                  required
                 />
                 <label htmlFor="address">Indirizzo </label>
                 <span className="red-text">{errors.address}</span>
               </div>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.latitude}
                   error={errors.latitude}
@@ -500,12 +539,13 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.latitude
                   })}
+                  required
                 />
                 <label htmlFor="latitude">Latitudine </label>
                 <span className="red-text">{errors.latitude}</span>
               </div>
               <div className="input-field col s12">
-                <input required
+                <input 
                   onChange={this.onChange}
                   value={this.state.longitude}
                   error={errors.longitude}
@@ -514,6 +554,7 @@ class Dashboard extends Component {
                   className={classnames("", {
                     invalid: errors.longitude
                   })}
+                  required
                 />
                 <label htmlFor="longitude">Longitudine</label>
                 <span className="red-text">{errors.longitude}</span>

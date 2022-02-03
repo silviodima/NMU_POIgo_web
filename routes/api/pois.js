@@ -11,7 +11,7 @@ const POI = require("../../models/POI");
 // @desc Add poi
 // @access Public
 router.post("/add", (req, res) => {
-    console.log(req.body)
+    // console.log(req.body)
     // Form validation
     const { errors, isValid } = validatePOIInsertion(req.body);
     // Check validation

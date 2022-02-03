@@ -71,7 +71,7 @@ module.exports = function validatePOIInsertion(data) {
   }
 
   // Section checks
-  if (data.clickedSections == undefined) {
+  if (data.clickedSections == undefined || data.clickedSections.length==0) {
     errors.clickedSections = "Scegli almeno una sezione";
   }
 

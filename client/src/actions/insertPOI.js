@@ -11,7 +11,7 @@ export const addPOI = (newPOI, history) => dispatch => {
   // console.log(newPOI)
     axios
       .post("/api/pois/add", newPOI)
-      .then(res => history.push("/dashboard"))
+      .then(res => history.push("/redirect"))
       .catch(err =>
         dispatch({
           type: GET_ERRORS,

@@ -1,6 +1,6 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
+// const bodyParser = require("body-parser");
 const passport = require("passport");
 
 const users = require("./routes/api/users");
@@ -10,13 +10,10 @@ const categories = require("./routes/api/categories");
 
 const app = express();
 app.use('/api/upload', express.json({ limit: '50mb' }), express.urlencoded({extended:true, limit: '50mb' }), upload);
-// Bodyparser middleware
-// app.use(
-//   bodyParser.urlencoded({
-//     extended: false
-//   })
-// );
-app.use(bodyParser.json());
+
+// app.use(bodyParser.json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 // DB Config
 const db = require("./config/keys").mongoURI;
